@@ -1,41 +1,38 @@
+import cron from 'node-cron';
+import axios from 'axios';
+import { MockERPAdapter } from './adapters/MockAdapter';
 import dotenv from 'dotenv';
-import { SHARED_VERSION } from '@gondola/shared';
-import { config, validateConfig } from './config';
-import { MockConnector } from './connectors/mock.connector';
-import { SyncJob } from './jobs/sync.job';
 
 dotenv.config();
 
-console.log(`🚀 Gôndola Agent starting... (Shared Version: ${SHARED_VERSION})`);
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000';
+const adapter = new MockERPAdapter();
 
-const main = async () => {
+async function syncData() {
+    console.log('Starting synchronization...');
     try {
-        // Validate configuration
-        validateConfig();
-        console.log(`📡 API URL: ${config.apiUrl}`);
-        console.log(`⏱️  Sync Interval: ${config.syncInterval}ms\n`);
+        // 1. Fetch Data
+        const products = await adapter.fetchProducts();
+        const stock = await adapter.fetchCurrentStock();
+        const sales = await adapter.fetchSales(new Date(), new Date());
 
-        // Initialize connector (using Mock for now)
-        const connector = new MockConnector();
-        const syncJob = new SyncJob(connector);
+        // 2. Send to Backend
+        await axios.post(`${BACKEND_URL}/ingest`, {
+            products,
+            stock,
+            sales,
+            timestamp: new Date(),
+        });
 
-        // Run initial sync
-        await syncJob.execute();
-
-        // Schedule periodic syncs
-        setInterval(async () => {
-            try {
-                await syncJob.execute();
-            } catch (error) {
-                console.error('Sync job failed:', error);
-            }
-        }, config.syncInterval);
-
-        console.log('✅ Agent initialized successfully. Running in background...');
+        console.log('Synchronization complete.');
     } catch (error) {
-        console.error('❌ Error initializing agent:', error);
-        process.exit(1);
+        console.error('Error during synchronization:', error);
     }
-};
+}
 
-main();
+// Run every minute for demo purposes
+cron.schedule('* * * * *', syncData);
+
+console.log('Gondola Agent started. Running sync every minute.');
+// Run once immediately on start
+syncData();

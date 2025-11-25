@@ -1,0 +1,4 @@
+mangaba_ai
+fastapi
+uvicorn
+python-dotenv

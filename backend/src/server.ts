@@ -1,36 +1,54 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { SHARED_VERSION } from '@gondola/shared';
-
-import authRoutes from './routes/auth.routes';
-import dataRoutes from './routes/data.routes';
-import metricsRoutes from './routes/metrics.routes';
-import aiRoutes from './routes/ai.routes';
+import ingestRoutes from './routes/ingest';
+import dashboardRoutes from './routes/dashboard';
+import uploadRoutes from './routes/upload';
 
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-// CORS configuration to allow frontend access
-app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 app.use(express.json());
 
-app.use('/auth', authRoutes);
-app.use('/api', dataRoutes);
-app.use('/api/metrics', metricsRoutes);
-app.use('/api/ai', aiRoutes);
+// Routes
+app.use('/ingest', ingestRoutes);
+app.use('/dashboard', dashboardRoutes);
+app.use('/upload', uploadRoutes);
+import { runAnalysis } from './services/scheduler';
 
-app.get('/', (req, res) => {
-    res.json({ message: 'Gôndola API is running', sharedVersion: SHARED_VERSION });
+app.post('/analysis/run', async (req, res) => {
+    try {
+        await runAnalysis();
+        res.json({ message: 'Analysis triggered successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to run analysis' });
+    }
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+import { query } from './db';
+
+app.post('/admin/clear-data', async (req, res) => {
+    try {
+        console.log('Clearing all data...');
+        // Truncate tables in correct order (due to foreign keys)
+        await query('TRUNCATE TABLE daily_sales, stock_snapshots, analysis_results, products CASCADE');
+        res.json({ message: 'Data cleared successfully' });
+    } catch (error) {
+        console.error('Error clearing data:', error);
+        res.status(500).json({ error: 'Failed to clear data' });
+    }
+});
+
+app.get('/', (req, res) => {
+    res.send('Gôndola Cloud API is running');
+});
+
+import { startScheduler } from './services/scheduler';
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+    startScheduler();
 });
