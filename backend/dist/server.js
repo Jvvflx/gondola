@@ -14,7 +14,13 @@ const ai_routes_1 = __importDefault(require("./routes/ai.routes"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
-app.use((0, cors_1.default)());
+// CORS configuration to allow frontend access
+app.use((0, cors_1.default)({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express_1.default.json());
 app.use('/auth', auth_routes_1.default);
 app.use('/api', data_routes_1.default);
