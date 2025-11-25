@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900 font-['Inter',sans-serif] antialiased;
+    min-height: 100vh;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gradient-to-b from-primary-400 to-accent-500 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply from-primary-500 to-accent-600;
+  }
+}
+
+@layer components {
+  /* Glassmorphism Card */
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-6;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  }
+
+  .glass-card-dark {
+    @apply bg-gray-900/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/10 p-6 text-white;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  /* Modern Card */
+  .card {
+    @apply bg-white rounded-2xl shadow-lg border border-gray-100 p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02];
+  }
+
+  .card-gradient {
+    @apply bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-100 p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02];
+  }
+
+  /* Metric Card */
+  .metric-card {
+    @apply relative overflow-hidden bg-white rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+  }
+
+  .metric-card::before {
+    content: '';
+    @apply absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-500 to-accent-500;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md;
+  }
+
+  .btn-primary {
+    @apply btn bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 shadow-primary-500/50;
+  }
+
+  .btn-accent {
+    @apply btn bg-gradient-to-r from-accent-600 to-accent-700 text-white hover:from-accent-700 hover:to-accent-800 shadow-accent-500/50;
+  }
+
+  .btn-secondary {
+    @apply btn bg-gray-100 text-gray-900 hover:bg-gray-200;
+  }
+
+  .btn-glass {
+    @apply btn bg-white/20 backdrop-blur-md text-white border border-white/30 hover:bg-white/30;
+  }
+
+  /* Input Fields */
+  .input-modern {
+    @apply w-full px-4 py-3 bg-white/80 backdrop-blur-sm border-2 border-gray-200 rounded-xl 
+           focus:ring-4 focus:ring-primary-500/20 focus:border-primary-500 
+           transition-all duration-300 outline-none;
+  }
+
+  .input-modern:focus {
+    @apply shadow-lg;
+  }
+
+  /* Alert Cards */
+  .alert-card {
+    @apply flex items-start gap-4 p-4 rounded-xl border-l-4 transition-all duration-300 hover:shadow-md;
+  }
+
+  .alert-danger {
+    @apply alert-card bg-red-50 border-red-500 text-red-900;
+  }
+
+  .alert-warning {
+    @apply alert-card bg-yellow-50 border-yellow-500 text-yellow-900;
+  }
+
+  .alert-info {
+    @apply alert-card bg-blue-50 border-blue-500 text-blue-900;
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent;
+  }
+
+  /* Floating Animation */
+  .float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  /* Shimmer Effect */
+  .shimmer {
+    @apply relative overflow-hidden;
+  }
+
+  .shimmer::after {
+    content: '';
+    @apply absolute top-0 left-0 w-full h-full;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+}
